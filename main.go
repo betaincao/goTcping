@@ -3,7 +3,7 @@
  * @Author: caoyouming
  * @LastEditors: Please set LastEditors
  * @Date: 2019-02-20 16:06:55
- * @LastEditTime: 2019-02-26 15:18:45
+ * @LastEditTime: 2019-02-26 15:20:43
  */
 package main
 
@@ -255,7 +255,7 @@ func main() {
 		for j := 0; j < ipListLen; j++ {
 			// fmt.Println(hostIp.Body[i].Ip_list[j])
 			tcping(hostIp.Body[i].Ip_list[j], port, "tcp", timeOfTcping)
-			// os.Exit(0)
+			os.Exit(0)
 		}
 	}
 	// structToJson()
