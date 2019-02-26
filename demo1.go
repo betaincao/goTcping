@@ -7,21 +7,18 @@ import "fmt"
  * @Author: your name
  * @LastEditors: Please set LastEditors
  * @Date: 2019-02-25 13:58:08
- * @LastEditTime: 2019-02-25 15:46:47
+ * @LastEditTime: 2019-02-26 15:50:20
  */
-func Count(ch chan int) {
-	ch <- 1
-	fmt.Println(ch)
+func Add(x, y int) {
+	z := x + y
+	fmt.Println(z)
 }
 
 func main() {
 	chs := make([]chan int, 10)
+
 	for i := 0; i < 10; i++ {
 		chs[i] = make(chan int)
-		// fmt.Println(chs[i])
-		go Count(chs[i])
-	}
-	for _, ch := range chs {
-		<-ch
+		go Add(i, i)
 	}
 }

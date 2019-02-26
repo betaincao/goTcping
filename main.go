@@ -3,7 +3,7 @@
  * @Author: caoyouming
  * @LastEditors: Please set LastEditors
  * @Date: 2019-02-20 16:06:55
- * @LastEditTime: 2019-02-26 15:20:43
+ * @LastEditTime: 2019-02-26 16:27:41
  */
 package main
 
@@ -32,6 +32,12 @@ var (
 
 //ini文件路径
 var iniPath string = "./config/moose.conf"
+
+//主协程channel
+var masterChannel = make(chan int, 1)
+
+//ping协程channel
+var channel = make(chan int, 1)
 
 //配置文件host_ip.conf解析后的结构
 type Host_ip struct {
@@ -137,6 +143,8 @@ func allConfig(iniPath string) Host_ip {
 * @return:
  */
 func tcping(ipAddress string, port string, network string, timeOfTcping int) {
+	// var ch chan int
+	channel <- 1
 	var confTimeout = readIniString(iniPath, "worker", "timeout")
 	timeInt, err := strconv.Atoi(confTimeout) //string转换为int
 	if err != nil {
@@ -183,6 +191,10 @@ func tcping(ipAddress string, port string, network string, timeOfTcping int) {
 		fmt.Printf("\tMinimum = %s, Maximum = %s, Average = %s, mdev = %.3fms\n", minimum, maximum, average, mdev)
 	} else {
 		fmt.Println("Was unable to connect, cannot provide trip statistics.")
+	}
+	<-channel
+	if len(channel) == 0 {
+		masterChannel <- 1
 	}
 }
 
@@ -254,10 +266,11 @@ func main() {
 		ipListLen := len(hostIp.Body[i].Ip_list)
 		for j := 0; j < ipListLen; j++ {
 			// fmt.Println(hostIp.Body[i].Ip_list[j])
-			tcping(hostIp.Body[i].Ip_list[j], port, "tcp", timeOfTcping)
-			os.Exit(0)
+			go tcping(hostIp.Body[i].Ip_list[j], port, "tcp", timeOfTcping)
+			// os.Exit(0)
 		}
 	}
+	<-masterChannel
 	// structToJson()
 	/* 测试数据 */
 	// ipAddress := "www.baidu.com"
